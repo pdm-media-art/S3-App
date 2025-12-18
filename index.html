@@ -98,10 +98,55 @@
       <p>Hier kommt später die Assets- & Vulnerabilitätsanalyse.</p>
     </section>
 
-    <!-- Incidents (Platzhalter) -->
+    <!-- Incidents -->
     <section id="page-incidents" class="page">
-      <h1>Incident Reporting (Coming soon)</h1>
-      <p>Hier kommt das Vorfallmeldesystem.</p>
+      <div class="page-header">
+        <h1>Incident Reporting</h1>
+        <button id="btnAddIncident" class="primary-btn">+ Neuer Vorfall</button>
+      </div>
+
+      <div class="filters">
+        <input
+          type="text"
+          id="incidentSearch"
+          placeholder="Suche nach Ort, Art, Beschreibung..."
+        />
+        <select id="incidentCategoryFilter">
+          <option value="">Alle Kategorien</option>
+          <option value="Security-Vorfälle">Security-Vorfälle</option>
+          <option value="Safety-Vorfälle">Safety-Vorfälle</option>
+          <option value="Compliance">Compliance</option>
+          <option value="Datenschutz">Datenschutz</option>
+          <option value="Brandschutz">Brandschutz</option>
+          <option value="IT-Vorfälle">IT-Vorfälle</option>
+        </select>
+        <select id="incidentStatusFilter">
+          <option value="">Alle Status</option>
+          <option value="offen">offen</option>
+          <option value="in Bearbeitung">in Bearbeitung</option>
+          <option value="geschlossen">geschlossen</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Datum/Zeit</th>
+              <th>Ort</th>
+              <th>Kategorie</th>
+              <th>Art</th>
+              <th>Schweregrad</th>
+              <th>Status</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody id="incidentTableBody">
+            <!-- per JS -->
+          </tbody>
+        </table>
+      </div>
     </section>
   </main>
 
@@ -249,6 +294,97 @@
 
         <div class="modal-footer">
           <button type="button" id="riskCancel" class="secondary-btn">
+            Abbrechen
+          </button>
+          <button type="submit" class="primary-btn">
+            Speichern
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Incident hinzufügen / bearbeiten -->
+  <div id="incidentModal" class="modal">
+    <div class="modal-backdrop"></div>
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="incidentModalTitle">Neuer Vorfall</h2>
+        <button id="incidentModalClose" class="icon-btn">&times;</button>
+      </div>
+
+      <form id="incidentForm" class="form">
+        <input type="hidden" id="incidentId" />
+
+        <label>
+          Datum & Uhrzeit
+          <input type="datetime-local" id="incidentDatetime" required />
+        </label>
+
+        <label>
+          Ort
+          <input type="text" id="incidentLocation" required />
+        </label>
+
+        <label>
+          Kategorie des Vorfalls
+          <select id="incidentCategory" required>
+            <option value="">Bitte wählen</option>
+            <option value="Security-Vorfälle">Security-Vorfälle</option>
+            <option value="Safety-Vorfälle">Safety-Vorfälle</option>
+            <option value="Compliance">Compliance</option>
+            <option value="Datenschutz">Datenschutz</option>
+            <option value="Brandschutz">Brandschutz</option>
+            <option value="IT-Vorfälle">IT-Vorfälle</option>
+          </select>
+        </label>
+
+        <label>
+          Art des Vorfalls
+          <input
+            type="text"
+            id="incidentType"
+            placeholder="z.B. Einbruch, Unfall, Verstoß..."
+            required
+          />
+        </label>
+
+        <label>
+          Meldende Person
+          <input type="text" id="incidentReporter" />
+        </label>
+
+        <label>
+          Schweregrad
+          <select id="incidentSeverity" required>
+            <option value="Niedrig">Niedrig</option>
+            <option value="Mittel">Mittel</option>
+            <option value="Hoch">Hoch</option>
+          </select>
+        </label>
+
+        <label>
+          Status
+          <select id="incidentStatus" required>
+            <option value="offen">offen</option>
+            <option value="in Bearbeitung">in Bearbeitung</option>
+            <option value="geschlossen">geschlossen</option>
+          </select>
+        </label>
+
+        <label>
+          Verantwortliche Person
+          <input type="text" id="incidentOwner" />
+        </label>
+
+        <label>
+          Beschreibung des Vorfalls
+          <textarea id="incidentDescription" rows="3"></textarea>
+        </label>
+
+        <div class="modal-footer">
+          <button type="button" id="incidentCancel" class="secondary-btn">
             Abbrechen
           </button>
           <button type="submit" class="primary-btn">
