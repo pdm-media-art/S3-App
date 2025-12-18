@@ -36,6 +36,7 @@ body {
   background: radial-gradient(circle at top, #1c1f24 0, #0b0d0f 55%);
   color: var(--text);
   min-height: 100vh;
+  overflow-y: auto; /* Scrollen immer möglich */
 }
 
 /* Header */
@@ -358,10 +359,13 @@ body {
   inset: 0;
   display: none;
   z-index: 50;
+  /* zentrieren mit Flexbox */
+  align-items: center;
+  justify-content: center;
 }
 
 .modal.open {
-  display: block;
+  display: flex;
 }
 
 .modal-backdrop {
@@ -375,12 +379,15 @@ body {
   position: relative;
   max-width: 480px;
   width: 100%;
+  max-height: 90vh;        /* Modal nicht höher als Viewport */
   margin: 4vh auto;
   background: #0b0d10;
   border-radius: 14px;
   border: 1px solid #262a32;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
   padding: 1rem;
+  overflow-y: auto;        /* Inhalt im Modal kann scrollen */
+  z-index: 1;
 }
 
 .modal-header {
