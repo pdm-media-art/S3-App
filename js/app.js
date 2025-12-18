@@ -15,7 +15,7 @@ navButtons.forEach((btn) => {
   });
 });
 
-// --- Risk Management (Threat Sheet) ---
+// --- Datenstrukturen & Storage Keys ---
 
 let risks = [];
 let incidents = [];
@@ -41,7 +41,9 @@ function loadIncidents() {
 
 function saveIncidents() {
   localStorage.setItem(INCIDENT_STORAGE_KEY, JSON.stringify(incidents));
-  function loadAssets() {
+}
+
+function loadAssets() {
   const raw = localStorage.getItem(ASSET_STORAGE_KEY);
   assets = raw ? JSON.parse(raw) : [];
 }
@@ -49,14 +51,15 @@ function saveIncidents() {
 function saveAssets() {
   localStorage.setItem(ASSET_STORAGE_KEY, JSON.stringify(assets));
 }
-}
 
-// Risk UI Elements
+// --- DOM-Referenzen ---
+
+// Risk UI
 const riskTableBody = document.getElementById("riskTableBody");
 const riskSearch = document.getElementById("riskSearch");
 const riskTypeFilter = document.getElementById("riskTypeFilter");
 
-// Risk Modal Elements
+// Risk Modal
 const riskModal = document.getElementById("riskModal");
 const riskModalTitle = document.getElementById("riskModalTitle");
 const riskModalClose = document.getElementById("riskModalClose");
@@ -88,7 +91,7 @@ const probRatingInput = document.getElementById("probRating");
 const impRatingInput = document.getElementById("impRating");
 const riskScoreInput = document.getElementById("riskScore");
 
-// Dashboard counters
+// Dashboard
 const openRisksEl = document.getElementById("openRisks");
 const openIncidentsEl = document.getElementById("openIncidents");
 
@@ -98,7 +101,7 @@ const incidentSearch = document.getElementById("incidentSearch");
 const incidentCategoryFilter = document.getElementById("incidentCategoryFilter");
 const incidentStatusFilter = document.getElementById("incidentStatusFilter");
 
-// Incident Modal Elements
+// Incident Modal
 const incidentModal = document.getElementById("incidentModal");
 const incidentModalTitle = document.getElementById("incidentModalTitle");
 const incidentModalClose = document.getElementById("incidentModalClose");
@@ -116,12 +119,13 @@ const incidentStatusInput = document.getElementById("incidentStatus");
 const incidentOwnerInput = document.getElementById("incidentOwner");
 const incidentDescriptionInput =
   document.getElementById("incidentDescription");
+
 // Asset UI
 const assetTableBody = document.getElementById("assetTableBody");
 const assetSearch = document.getElementById("assetSearch");
 const assetZoneFilter = document.getElementById("assetZoneFilter");
 
-// Asset Modal Elements
+// Asset Modal
 const assetModal = document.getElementById("assetModal");
 const assetModalTitle = document.getElementById("assetModalTitle");
 const assetModalClose = document.getElementById("assetModalClose");
@@ -139,6 +143,7 @@ const assetVulnIndexInput = document.getElementById("assetVulnIndex");
 const assetZoneInput = document.getElementById("assetZone");
 
 // --- Risk Modal: open/close ---
+
 document.getElementById("btnAddRisk").addEventListener("click", () => {
   openRiskModal();
 });
@@ -201,10 +206,49 @@ function closeRiskModal() {
 }
 
 // --- Incident Modal: open/close ---
+
 document.getElementById("btnAddIncident").addEventListener("click", () => {
   openIncidentModal();
 });
+
+incidentModalClose.addEventListener("click", closeIncidentModal);
+incidentCancel.addEventListener("click", closeIncidentModal);
+incidentModal.addEventListener("click", (e) => {
+  if (e.target.classList.contains("modal-backdrop")) {
+    closeIncidentModal();
+  }
+});
+
+function openIncidentModal(incident = null) {
+  if (incident) {
+    incidentModalTitle.textContent = "Vorfall bearbeiten";
+    incidentIdInput.value = incident.id;
+    incidentDatetimeInput.value = incident.datetime || "";
+    incidentLocationInput.value = incident.location || "";
+    incidentCategoryInput.value = incident.category || "";
+    incidentTypeInput.value = incident.type || "";
+    incidentReporterInput.value = incident.reporter || "";
+    incidentSeverityInput.value = incident.severity || "Mittel";
+    incidentStatusInput.value = incident.status || "offen";
+    incidentOwnerInput.value = incident.owner || "";
+    incidentDescriptionInput.value = incident.description || "";
+  } else {
+    incidentModalTitle.textContent = "Neuer Vorfall";
+    incidentForm.reset();
+    incidentIdInput.value = "";
+    incidentSeverityInput.value = "Mittel";
+    incidentStatusInput.value = "offen";
+  }
+
+  incidentModal.classList.add("open");
+}
+
+function closeIncidentModal() {
+  incidentModal.classList.remove("open");
+}
+
 // --- Asset Modal: open/close ---
+
 document.getElementById("btnAddAsset").addEventListener("click", () => {
   openAssetModal();
 });
@@ -244,79 +288,25 @@ function openAssetModal(asset = null) {
 function closeAssetModal() {
   assetModal.classList.remove("open");
 }
-incidentModalClose.addEventListener("click", closeIncidentModal);
-incidentCancel.addEventListener("click", closeIncidentModal);
-incidentModal.addEventListener("click", (e) => {
-  if (e.target.classList.contains("modal-backdrop")) {
-    closeIncidentModal();
-  }
-});
-
-function openIncidentModal(incident = null) {
-  if (incident) {
-    incidentModalTitle.textContent = "Vorfall bearbeiten";
-    incidentIdInput.value = incident.id;
-    incidentDatetimeInput.value = incident.datetime || "";
-    incidentLocationInput.value = incident.location || "";
-    incidentCategoryInput.value = incident.category || "";
-    incidentTypeInput.value = incident.type || "";
-    incidentReporterInput.value = incident.reporter || "";
-    incidentSeverityInput.value = incident.severity || "Mittel";
-    incidentStatusInput.value = incident.status || "offen";
-    incidentOwnerInput.value = incident.owner || "";
-    incidentDescriptionInput.value = incident.description || "";
-  } else {
-    incidentModalTitle.textContent = "Neuer Vorfall";
-    incidentForm.reset();
-    incidentIdInput.value = "";
-    incidentSeverityInput.value = "Mittel";
-    incidentStatusInput.value = "offen";
-  }
-
-  incidentModal.classList.add("open");
-}
-
-function closeIncidentModal() {
-  incidentModal.classList.remove("open");
-}
 
 // --- Risiko-Berechnung ---
 
 function recomputeAllScores() {
-  // Eintrittswahrscheinlichkeit
   const e1 = Number(probFreqInput.value) || 0;
   const e2_raw = Number(probControlsInput.value) || 0;
   const e3 = Number(probSignsInput.value) || 0;
   const e4 = Number(probComplexityInput.value) || 0;
-  const e2 = e2_raw ? 6 - e2_raw : 0; // 5 = gut => geringer Beitrag
-  function recomputeAssetVuln() {
-  const c = Number(assetCriticalityInput.value) || 0;
-  const p = Number(assetProtectionInput.value) || 0;
-  const vuln = c * (11 - p); // je besser Schutz (p), desto niedriger Vuln
-
-  assetVulnIndexInput.value = vuln.toFixed(0);
-
-  let zone = "Grün";
-  if (vuln >= 60) zone = "Rot";
-  else if (vuln >= 30) zone = "Gelb";
-
-  assetZoneInput.value = zone;
-}
-
-[assetCriticalityInput, assetProtectionInput].forEach((el) =>
-  el.addEventListener("input", recomputeAssetVuln)
-);
+  const e2 = e2_raw ? 6 - e2_raw : 0;
 
   const probRating = (e1 + e2 + e3 + e4) / 4;
   probRatingInput.value = probRating.toFixed(2);
 
-  // Schadenausmaß
   const s1 = Number(impPeopleInput.value) || 0;
   const s2 = Number(impAssetsInput.value) || 0;
   const s3 = Number(impReputationInput.value) || 0;
   const s4 = Number(impLegalInput.value) || 0;
   const s5_raw = Number(impResilienceInput.value) || 0;
-  const s5 = s5_raw ? 6 - s5_raw : 0; // 5 = hohe Resilienz => geringer Beitrag
+  const s5 = s5_raw ? 6 - s5_raw : 0;
 
   const impRating = (s1 + s2 + s3 + s4 + s5) / 5;
   impRatingInput.value = impRating.toFixed(2);
@@ -337,7 +327,28 @@ function recomputeAllScores() {
   impResilienceInput,
 ].forEach((el) => el.addEventListener("input", recomputeAllScores));
 
+// --- Asset Vulnerability-Berechnung ---
+
+function recomputeAssetVuln() {
+  const c = Number(assetCriticalityInput.value) || 0;
+  const p = Number(assetProtectionInput.value) || 0;
+  const vuln = c * (11 - p);
+
+  assetVulnIndexInput.value = vuln.toFixed(0);
+
+  let zone = "Grün";
+  if (vuln >= 60) zone = "Rot";
+  else if (vuln >= 30) zone = "Gelb";
+
+  assetZoneInput.value = zone;
+}
+
+[assetCriticalityInput, assetProtectionInput].forEach((el) =>
+  el.addEventListener("input", recomputeAssetVuln)
+);
+
 // --- Risk Submit ---
+
 riskForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -382,11 +393,41 @@ riskForm.addEventListener("submit", (e) => {
 });
 
 // --- Incident Submit ---
+
 incidentForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const id = incidentIdInput.value || generateIncidentId();
-  assetForm.addEventListener("submit", (e) => {
+
+  const incident = {
+    id,
+    datetime: incidentDatetimeInput.value,
+    location: incidentLocationInput.value.trim(),
+    category: incidentCategoryInput.value,
+    type: incidentTypeInput.value.trim(),
+    reporter: incidentReporterInput.value.trim(),
+    severity: incidentSeverityInput.value,
+    status: incidentStatusInput.value,
+    owner: incidentOwnerInput.value.trim(),
+    description: incidentDescriptionInput.value.trim(),
+    createdAt: new Date().toISOString(),
+  };
+
+  const existingIndex = incidents.findIndex((i) => i.id === id);
+  if (existingIndex >= 0) {
+    incidents[existingIndex] = { ...incidents[existingIndex], ...incident };
+  } else {
+    incidents.push(incident);
+  }
+
+  saveIncidents();
+  renderIncidents();
+  closeIncidentModal();
+});
+
+// --- Asset Submit ---
+
+assetForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const id = assetIdInput.value || generateAssetId();
@@ -415,112 +456,9 @@ incidentForm.addEventListener("submit", (e) => {
   renderAssets();
   closeAssetModal();
 });
-function renderAssets() {
-  if (!assetTableBody) return;
 
-  const search = (assetSearch?.value || "").trim().toLowerCase();
-  const zoneFilter = assetZoneFilter?.value || "";
+// --- ID Generatoren ---
 
-  const filtered = assets.filter((a) => {
-    const searchText =
-      (a.name || "") +
-      " " +
-      (a.type || "") +
-      " " +
-      (a.location || "") +
-      " " +
-      (a.owner || "");
-    const matchesSearch =
-      !search || searchText.toLowerCase().includes(search);
-    const matchesZone = !zoneFilter || a.zone === zoneFilter;
-    return matchesSearch && matchesZone;
-  });
-
-  assetTableBody.innerHTML = "";
-
-  filtered.forEach((a) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${a.id}</td>
-      <td>${escapeHtml(a.name)}</td>
-      <td>${escapeHtml(a.type)}</td>
-      <td>${escapeHtml(a.location)}</td>
-      <td>${escapeHtml(a.owner)}</td>
-      <td>${a.vulnIndex ?? ""}</td>
-      <td>${escapeHtml(a.zone || "")}</td>
-      <td>
-        <button class="secondary-btn btn-sm" data-action="edit-asset" data-id="${a.id}">
-          Bearbeiten
-        </button>
-        <button class="secondary-btn btn-sm" data-action="delete-asset" data-id="${a.id}">
-          Löschen
-        </button>
-      </td>
-    `;
-    assetTableBody.appendChild(tr);
-  });
-}
-
-if (assetTableBody) {
-  assetTableBody.addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
-
-    const id = btn.dataset.id;
-    const action = btn.dataset.action;
-    const asset = assets.find((a) => a.id === id);
-    if (!asset) return;
-
-    if (action === "edit-asset") {
-      openAssetModal(asset);
-    } else if (action === "delete-asset") {
-      if (confirm(`Asset ${asset.name} wirklich löschen?`)) {
-        assets = assets.filter((a) => a.id !== id);
-        saveAssets();
-        renderAssets();
-      }
-    }
-  });
-}
-
-[assetSearch, assetZoneFilter].forEach((el) => {
-  if (!el) return;
-  el.addEventListener("input", renderAssets);
-  el.addEventListener("change", renderAssets);
-});
-function generateAssetId() {
-  const prefix = "A";
-  const num = String(Math.floor(Math.random() * 999999)).padStart(6, "0");
-  return `${prefix}-${num}`;
-}
-
-  const incident = {
-    id,
-    datetime: incidentDatetimeInput.value,
-    location: incidentLocationInput.value.trim(),
-    category: incidentCategoryInput.value,
-    type: incidentTypeInput.value.trim(),
-    reporter: incidentReporterInput.value.trim(),
-    severity: incidentSeverityInput.value,
-    status: incidentStatusInput.value,
-    owner: incidentOwnerInput.value.trim(),
-    description: incidentDescriptionInput.value.trim(),
-    createdAt: new Date().toISOString(),
-  };
-
-  const existingIndex = incidents.findIndex((i) => i.id === id);
-  if (existingIndex >= 0) {
-    incidents[existingIndex] = { ...incidents[existingIndex], ...incident };
-  } else {
-    incidents.push(incident);
-  }
-
-  saveIncidents();
-  renderIncidents();
-  closeIncidentModal();
-});
-
-// --- ID Generator ---
 function generateRiskId() {
   const prefix = "R";
   const num = String(Math.floor(Math.random() * 999999)).padStart(6, "0");
@@ -533,7 +471,14 @@ function generateIncidentId() {
   return `${prefix}-${num}`;
 }
 
+function generateAssetId() {
+  const prefix = "A";
+  const num = String(Math.floor(Math.random() * 999999)).padStart(6, "0");
+  return `${prefix}-${num}`;
+}
+
 // --- Render Risks ---
+
 function renderRisks() {
   const search = (riskSearch.value || "").trim().toLowerCase();
   const type = riskTypeFilter.value;
@@ -605,53 +550,9 @@ riskTableBody.addEventListener("click", (e) => {
 );
 
 // --- Render Incidents ---
+
 function renderIncidents() {
   if (!incidentTableBody) return;
-  function renderAssets() {
-  if (!assetTableBody) return;
-
-  const search = (assetSearch?.value || "").trim().toLowerCase();
-  const zoneFilter = assetZoneFilter?.value || "";
-
-  const filtered = assets.filter((a) => {
-    const searchText =
-      (a.name || "") +
-      " " +
-      (a.type || "") +
-      " " +
-      (a.location || "") +
-      " " +
-      (a.owner || "");
-    const matchesSearch =
-      !search || searchText.toLowerCase().includes(search);
-    const matchesZone = !zoneFilter || a.zone === zoneFilter;
-    return matchesSearch && matchesZone;
-  });
-
-  assetTableBody.innerHTML = "";
-
-  filtered.forEach((a) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${a.id}</td>
-      <td>${escapeHtml(a.name)}</td>
-      <td>${escapeHtml(a.type)}</td>
-      <td>${escapeHtml(a.location)}</td>
-      <td>${escapeHtml(a.owner)}</td>
-      <td>${a.vulnIndex ?? ""}</td>
-      <td>${escapeHtml(a.zone || "")}</td>
-      <td>
-        <button class="secondary-btn btn-sm" data-action="edit-asset" data-id="${a.id}">
-          Bearbeiten
-        </button>
-        <button class="secondary-btn btn-sm" data-action="delete-asset" data-id="${a.id}">
-          Löschen
-        </button>
-      </td>
-    `;
-    assetTableBody.appendChild(tr);
-  });
-}
 
   const search = (incidentSearch?.value || "").trim().toLowerCase();
   const cat = incidentCategoryFilter?.value || "";
@@ -731,7 +632,84 @@ if (incidentTableBody) {
   }
 );
 
+// --- Render Assets ---
+
+function renderAssets() {
+  if (!assetTableBody) return;
+
+  const search = (assetSearch?.value || "").trim().toLowerCase();
+  const zoneFilter = assetZoneFilter?.value || "";
+
+  const filtered = assets.filter((a) => {
+    const searchText =
+      (a.name || "") +
+      " " +
+      (a.type || "") +
+      " " +
+      (a.location || "") +
+      " " +
+      (a.owner || "");
+    const matchesSearch =
+      !search || searchText.toLowerCase().includes(search);
+    const matchesZone = !zoneFilter || a.zone === zoneFilter;
+    return matchesSearch && matchesZone;
+  });
+
+  assetTableBody.innerHTML = "";
+
+  filtered.forEach((a) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${a.id}</td>
+      <td>${escapeHtml(a.name)}</td>
+      <td>${escapeHtml(a.type)}</td>
+      <td>${escapeHtml(a.location)}</td>
+      <td>${escapeHtml(a.owner)}</td>
+      <td>${a.vulnIndex ?? ""}</td>
+      <td>${escapeHtml(a.zone || "")}</td>
+      <td>
+        <button class="secondary-btn btn-sm" data-action="edit-asset" data-id="${a.id}">
+          Bearbeiten
+        </button>
+        <button class="secondary-btn btn-sm" data-action="delete-asset" data-id="${a.id}">
+          Löschen
+        </button>
+      </td>
+    `;
+    assetTableBody.appendChild(tr);
+  });
+}
+
+if (assetTableBody) {
+  assetTableBody.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    const asset = assets.find((a) => a.id === id);
+    if (!asset) return;
+
+    if (action === "edit-asset") {
+      openAssetModal(asset);
+    } else if (action === "delete-asset") {
+      if (confirm(`Asset ${asset.name} wirklich löschen?`)) {
+        assets = assets.filter((a) => a.id !== id);
+        saveAssets();
+        renderAssets();
+      }
+    }
+  });
+}
+
+[assetSearch, assetZoneFilter].forEach((el) => {
+  if (!el) return;
+  el.addEventListener("input", renderAssets);
+  el.addEventListener("change", renderAssets);
+});
+
 // --- Risikomatrix ---
+
 function renderRiskMatrix() {
   const container = document.getElementById("riskMatrix");
   if (!container) return;
@@ -784,6 +762,7 @@ function riskCellClass(p, i) {
 }
 
 // --- Helpers ---
+
 function escapeHtml(str) {
   return (str || "")
     .replace(/&/g, "&amp;")
@@ -812,6 +791,7 @@ function formatDateTime(value) {
 }
 
 // --- Init ---
+
 loadRisks();
 loadIncidents();
 loadAssets();
