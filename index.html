@@ -94,10 +94,46 @@
       </div>
     </section>
 
-    <!-- Assets (Platzhalter) -->
+    <!-- Assets -->
     <section id="page-assets" class="page">
-      <h1>Assets (Coming soon)</h1>
-      <p>Hier kommt später die Assets- & Vulnerabilitätsanalyse.</p>
+      <div class="page-header">
+        <h1>Assets & Vulnerabilität</h1>
+        <button id="btnAddAsset" class="primary-btn">+ Neues Asset</button>
+      </div>
+
+      <div class="filters">
+        <input
+          type="text"
+          id="assetSearch"
+          placeholder="Suche nach Asset-Name, Typ, Location..."
+        />
+        <select id="assetZoneFilter">
+          <option value="">Alle Zonen</option>
+          <option value="Rot">Rot</option>
+          <option value="Gelb">Gelb</option>
+          <option value="Grün">Grün</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Typ</th>
+              <th>Location</th>
+              <th>Owner</th>
+              <th>Vuln-Index</th>
+              <th>Zone</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody id="assetTableBody">
+            <!-- per JS -->
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Incidents -->
@@ -396,7 +432,92 @@
       </form>
     </div>
   </div>
+<!-- Modal Asset hinzufügen / bearbeiten -->
+  <div id="assetModal" class="modal">
+    <div class="modal-backdrop"></div>
 
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="assetModalTitle">Neues Asset</h2>
+        <button id="assetModalClose" class="icon-btn">&times;</button>
+      </div>
+
+      <form id="assetForm" class="form">
+        <input type="hidden" id="assetId" />
+
+        <label>
+          Asset-Name
+          <input type="text" id="assetName" required />
+        </label>
+
+        <label>
+          Asset-Typ
+          <input
+            type="text"
+            id="assetType"
+            placeholder="z.B. Gebäude, Server, Fahrzeug"
+          />
+        </label>
+
+        <label>
+          Location
+          <input
+            type="text"
+            id="assetLocation"
+            placeholder="z.B. Standort, Adresse, Bereich"
+          />
+        </label>
+
+        <label>
+          Owner
+          <input type="text" id="assetOwner" />
+        </label>
+
+        <div class="form-row-2">
+          <label>
+            Kritikalität (1–10)
+            <input
+              type="number"
+              id="assetCriticality"
+              min="1"
+              max="10"
+              value="5"
+            />
+          </label>
+          <label>
+            Schutzstatus (1–10, 10=sehr gut)
+            <input
+              type="number"
+              id="assetProtection"
+              min="1"
+              max="10"
+              value="5"
+            />
+          </label>
+        </div>
+
+        <div class="form-row-2">
+          <label>
+            Vulnerabilitäts-Index (auto)
+            <input type="number" id="assetVulnIndex" readonly />
+          </label>
+          <label>
+            Zone (auto)
+            <input type="text" id="assetZone" readonly />
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="assetCancel" class="secondary-btn">
+            Abbrechen
+          </button>
+          <button type="submit" class="primary-btn">
+            Speichern
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
   <script src="js/app.js"></script>
 </body>
 </html>
