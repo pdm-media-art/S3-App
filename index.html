@@ -85,6 +85,11 @@
           </tbody>
         </table>
       </div>
+
+      <h2>Risikomatrix</h2>
+      <div id="riskMatrix" class="risk-matrix">
+        <!-- wird per JS gebaut -->
+      </div>
     </section>
 
     <!-- Assets (Platzhalter) -->
@@ -156,27 +161,82 @@
           <textarea id="riskDescription" rows="3"></textarea>
         </label>
 
+        <h3>Eintrittswahrscheinlichkeit (Kriterien 1–5)</h3>
         <div class="form-row-2">
           <label>
-            Eintrittswahrscheinlichkeit (1–5)
+            Relative Eintrittshäufigkeit (1–5)
+            <input type="number" id="probFreq" min="1" max="5" value="3" />
+          </label>
+          <label>
+            Ist-Zustand der Sicherheitsmaßnahmen (1–5, 5=gut)
+            <input type="number" id="probControls" min="1" max="5" value="3" />
+          </label>
+        </div>
+        <div class="form-row-2">
+          <label>
+            Anzeichen eines Schadensereignisses (1–5)
+            <input type="number" id="probSigns" min="1" max="5" value="3" />
+          </label>
+          <label>
+            Angriffskomplexität / kriminelle Energie (1–5)
             <input
               type="number"
-              id="riskProb"
+              id="probComplexity"
               min="1"
               max="5"
               value="3"
             />
           </label>
+        </div>
 
+        <h3>Schadenausmaß (Kriterien 1–5)</h3>
+        <div class="form-row-2">
           <label>
-            Schadenausmaß (1–5)
+            Personenschäden (1–5)
+            <input type="number" id="impPeople" min="1" max="5" value="3" />
+          </label>
+          <label>
+            Sachschäden (1–5)
+            <input type="number" id="impAssets" min="1" max="5" value="3" />
+          </label>
+        </div>
+        <div class="form-row-2">
+          <label>
+            Immaterielle Schäden (1–5)
             <input
               type="number"
-              id="riskImpact"
+              id="impReputation"
               min="1"
               max="5"
               value="3"
             />
+          </label>
+          <label>
+            Rechtliche Konsequenzen (1–5)
+            <input type="number" id="impLegal" min="1" max="5" value="3" />
+          </label>
+        </div>
+        <div class="form-row-2">
+          <label>
+            Interner Resistenzlevel (1–5, 5=gut)
+            <input
+              type="number"
+              id="impResilience"
+              min="1"
+              max="5"
+              value="3"
+            />
+          </label>
+        </div>
+
+        <div class="form-row-2">
+          <label>
+            Eintritts-Rating (auto)
+            <input type="number" id="probRating" readonly />
+          </label>
+          <label>
+            Schadens-Rating (auto)
+            <input type="number" id="impRating" readonly />
           </label>
         </div>
 
