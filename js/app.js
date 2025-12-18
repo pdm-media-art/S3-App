@@ -19,9 +19,11 @@ navButtons.forEach((btn) => {
 
 let risks = [];
 let incidents = [];
+let assets = [];
 
 const RISK_STORAGE_KEY = "securestay_risks_v1";
 const INCIDENT_STORAGE_KEY = "securestay_incidents_v1";
+const ASSET_STORAGE_KEY = "securestay_assets_v1";
 
 function loadRisks() {
   const raw = localStorage.getItem(RISK_STORAGE_KEY);
@@ -39,6 +41,14 @@ function loadIncidents() {
 
 function saveIncidents() {
   localStorage.setItem(INCIDENT_STORAGE_KEY, JSON.stringify(incidents));
+  function loadAssets() {
+  const raw = localStorage.getItem(ASSET_STORAGE_KEY);
+  assets = raw ? JSON.parse(raw) : [];
+}
+
+function saveAssets() {
+  localStorage.setItem(ASSET_STORAGE_KEY, JSON.stringify(assets));
+}
 }
 
 // Risk UI Elements
@@ -106,6 +116,27 @@ const incidentStatusInput = document.getElementById("incidentStatus");
 const incidentOwnerInput = document.getElementById("incidentOwner");
 const incidentDescriptionInput =
   document.getElementById("incidentDescription");
+// Asset UI
+const assetTableBody = document.getElementById("assetTableBody");
+const assetSearch = document.getElementById("assetSearch");
+const assetZoneFilter = document.getElementById("assetZoneFilter");
+
+// Asset Modal Elements
+const assetModal = document.getElementById("assetModal");
+const assetModalTitle = document.getElementById("assetModalTitle");
+const assetModalClose = document.getElementById("assetModalClose");
+const assetCancel = document.getElementById("assetCancel");
+const assetForm = document.getElementById("assetForm");
+
+const assetIdInput = document.getElementById("assetId");
+const assetNameInput = document.getElementById("assetName");
+const assetTypeInput = document.getElementById("assetType");
+const assetLocationInput = document.getElementById("assetLocation");
+const assetOwnerInput = document.getElementById("assetOwner");
+const assetCriticalityInput = document.getElementById("assetCriticality");
+const assetProtectionInput = document.getElementById("assetProtection");
+const assetVulnIndexInput = document.getElementById("assetVulnIndex");
+const assetZoneInput = document.getElementById("assetZone");
 
 // --- Risk Modal: open/close ---
 document.getElementById("btnAddRisk").addEventListener("click", () => {
@@ -173,7 +204,46 @@ function closeRiskModal() {
 document.getElementById("btnAddIncident").addEventListener("click", () => {
   openIncidentModal();
 });
+// --- Asset Modal: open/close ---
+document.getElementById("btnAddAsset").addEventListener("click", () => {
+  openAssetModal();
+});
 
+assetModalClose.addEventListener("click", closeAssetModal);
+assetCancel.addEventListener("click", closeAssetModal);
+assetModal.addEventListener("click", (e) => {
+  if (e.target.classList.contains("modal-backdrop")) {
+    closeAssetModal();
+  }
+});
+
+function openAssetModal(asset = null) {
+  if (asset) {
+    assetModalTitle.textContent = "Asset bearbeiten";
+    assetIdInput.value = asset.id;
+    assetNameInput.value = asset.name || "";
+    assetTypeInput.value = asset.type || "";
+    assetLocationInput.value = asset.location || "";
+    assetOwnerInput.value = asset.owner || "";
+    assetCriticalityInput.value = asset.criticality ?? 5;
+    assetProtectionInput.value = asset.protection ?? 5;
+
+    recomputeAssetVuln();
+  } else {
+    assetModalTitle.textContent = "Neues Asset";
+    assetForm.reset();
+    assetIdInput.value = "";
+    assetCriticalityInput.value = 5;
+    assetProtectionInput.value = 5;
+    recomputeAssetVuln();
+  }
+
+  assetModal.classList.add("open");
+}
+
+function closeAssetModal() {
+  assetModal.classList.remove("open");
+}
 incidentModalClose.addEventListener("click", closeIncidentModal);
 incidentCancel.addEventListener("click", closeIncidentModal);
 incidentModal.addEventListener("click", (e) => {
@@ -219,6 +289,23 @@ function recomputeAllScores() {
   const e3 = Number(probSignsInput.value) || 0;
   const e4 = Number(probComplexityInput.value) || 0;
   const e2 = e2_raw ? 6 - e2_raw : 0; // 5 = gut => geringer Beitrag
+  function recomputeAssetVuln() {
+  const c = Number(assetCriticalityInput.value) || 0;
+  const p = Number(assetProtectionInput.value) || 0;
+  const vuln = c * (11 - p); // je besser Schutz (p), desto niedriger Vuln
+
+  assetVulnIndexInput.value = vuln.toFixed(0);
+
+  let zone = "Grün";
+  if (vuln >= 60) zone = "Rot";
+  else if (vuln >= 30) zone = "Gelb";
+
+  assetZoneInput.value = zone;
+}
+
+[assetCriticalityInput, assetProtectionInput].forEach((el) =>
+  el.addEventListener("input", recomputeAssetVuln)
+);
 
   const probRating = (e1 + e2 + e3 + e4) / 4;
   probRatingInput.value = probRating.toFixed(2);
@@ -299,6 +386,113 @@ incidentForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const id = incidentIdInput.value || generateIncidentId();
+  assetForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const id = assetIdInput.value || generateAssetId();
+
+  const asset = {
+    id,
+    name: assetNameInput.value.trim(),
+    type: assetTypeInput.value.trim(),
+    location: assetLocationInput.value.trim(),
+    owner: assetOwnerInput.value.trim(),
+    criticality: Number(assetCriticalityInput.value) || 0,
+    protection: Number(assetProtectionInput.value) || 0,
+    vulnIndex: Number(assetVulnIndexInput.value) || 0,
+    zone: assetZoneInput.value || "",
+    createdAt: new Date().toISOString(),
+  };
+
+  const existingIndex = assets.findIndex((a) => a.id === id);
+  if (existingIndex >= 0) {
+    assets[existingIndex] = { ...assets[existingIndex], ...asset };
+  } else {
+    assets.push(asset);
+  }
+
+  saveAssets();
+  renderAssets();
+  closeAssetModal();
+});
+function renderAssets() {
+  if (!assetTableBody) return;
+
+  const search = (assetSearch?.value || "").trim().toLowerCase();
+  const zoneFilter = assetZoneFilter?.value || "";
+
+  const filtered = assets.filter((a) => {
+    const searchText =
+      (a.name || "") +
+      " " +
+      (a.type || "") +
+      " " +
+      (a.location || "") +
+      " " +
+      (a.owner || "");
+    const matchesSearch =
+      !search || searchText.toLowerCase().includes(search);
+    const matchesZone = !zoneFilter || a.zone === zoneFilter;
+    return matchesSearch && matchesZone;
+  });
+
+  assetTableBody.innerHTML = "";
+
+  filtered.forEach((a) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${a.id}</td>
+      <td>${escapeHtml(a.name)}</td>
+      <td>${escapeHtml(a.type)}</td>
+      <td>${escapeHtml(a.location)}</td>
+      <td>${escapeHtml(a.owner)}</td>
+      <td>${a.vulnIndex ?? ""}</td>
+      <td>${escapeHtml(a.zone || "")}</td>
+      <td>
+        <button class="secondary-btn btn-sm" data-action="edit-asset" data-id="${a.id}">
+          Bearbeiten
+        </button>
+        <button class="secondary-btn btn-sm" data-action="delete-asset" data-id="${a.id}">
+          Löschen
+        </button>
+      </td>
+    `;
+    assetTableBody.appendChild(tr);
+  });
+}
+
+if (assetTableBody) {
+  assetTableBody.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    const asset = assets.find((a) => a.id === id);
+    if (!asset) return;
+
+    if (action === "edit-asset") {
+      openAssetModal(asset);
+    } else if (action === "delete-asset") {
+      if (confirm(`Asset ${asset.name} wirklich löschen?`)) {
+        assets = assets.filter((a) => a.id !== id);
+        saveAssets();
+        renderAssets();
+      }
+    }
+  });
+}
+
+[assetSearch, assetZoneFilter].forEach((el) => {
+  if (!el) return;
+  el.addEventListener("input", renderAssets);
+  el.addEventListener("change", renderAssets);
+});
+function generateAssetId() {
+  const prefix = "A";
+  const num = String(Math.floor(Math.random() * 999999)).padStart(6, "0");
+  return `${prefix}-${num}`;
+}
 
   const incident = {
     id,
@@ -413,6 +607,51 @@ riskTableBody.addEventListener("click", (e) => {
 // --- Render Incidents ---
 function renderIncidents() {
   if (!incidentTableBody) return;
+  function renderAssets() {
+  if (!assetTableBody) return;
+
+  const search = (assetSearch?.value || "").trim().toLowerCase();
+  const zoneFilter = assetZoneFilter?.value || "";
+
+  const filtered = assets.filter((a) => {
+    const searchText =
+      (a.name || "") +
+      " " +
+      (a.type || "") +
+      " " +
+      (a.location || "") +
+      " " +
+      (a.owner || "");
+    const matchesSearch =
+      !search || searchText.toLowerCase().includes(search);
+    const matchesZone = !zoneFilter || a.zone === zoneFilter;
+    return matchesSearch && matchesZone;
+  });
+
+  assetTableBody.innerHTML = "";
+
+  filtered.forEach((a) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${a.id}</td>
+      <td>${escapeHtml(a.name)}</td>
+      <td>${escapeHtml(a.type)}</td>
+      <td>${escapeHtml(a.location)}</td>
+      <td>${escapeHtml(a.owner)}</td>
+      <td>${a.vulnIndex ?? ""}</td>
+      <td>${escapeHtml(a.zone || "")}</td>
+      <td>
+        <button class="secondary-btn btn-sm" data-action="edit-asset" data-id="${a.id}">
+          Bearbeiten
+        </button>
+        <button class="secondary-btn btn-sm" data-action="delete-asset" data-id="${a.id}">
+          Löschen
+        </button>
+      </td>
+    `;
+    assetTableBody.appendChild(tr);
+  });
+}
 
   const search = (incidentSearch?.value || "").trim().toLowerCase();
   const cat = incidentCategoryFilter?.value || "";
@@ -575,6 +814,11 @@ function formatDateTime(value) {
 // --- Init ---
 loadRisks();
 loadIncidents();
+loadAssets();
+
 renderRisks();
 renderIncidents();
+renderAssets();
+
 recomputeAllScores();
+recomputeAssetVuln();
