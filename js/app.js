@@ -820,6 +820,120 @@ function seedDemoData() {
 }
 
 // ===========================
+// Spinnweben / Radar-Chart für Dashboard
+// ===========================
+function drawSecurityRadar(options) {
+  const canvas = document.getElementById(options.canvasId);
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const maxRadius = Math.min(width, height) * 0.38;
+
+  const labels = options.labels;
+  const values = options.values; // Werte 0–10
+  const maxValue = options.maxValue || 10;
+  const levels = options.levels || 5;
+
+  ctx.clearRect(0, 0, width, height);
+
+  ctx.save();
+  ctx.translate(centerX, centerY);
+
+  const angleStep = (Math.PI * 2) / labels.length;
+
+  // Hintergrund-Ringe
+  for (let level = 1; level <= levels; level++) {
+    const radius = (maxRadius / levels) * level;
+    ctx.beginPath();
+    for (let i = 0; i < labels.length; i++) {
+      const angle = i * angleStep - Math.PI / 2;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Achsen
+  for (let i = 0; i < labels.length; i++) {
+    const angle = i * angleStep - Math.PI / 2;
+    const x = Math.cos(angle) * maxRadius;
+    const y = Math.sin(angle) * maxRadius;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Datenpolygon
+  ctx.beginPath();
+  for (let i = 0; i < values.length; i++) {
+    const value = Math.max(0, Math.min(values[i], maxValue));
+    const radius = (value / maxValue) * maxRadius;
+    const angle = i * angleStep - Math.PI / 2;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+
+  // Füllung
+  ctx.fillStyle = "rgba(0, 200, 255, 0.25)";
+  ctx.fill();
+
+  // Rand
+  ctx.strokeStyle = "rgba(0, 200, 255, 0.9)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Punkte
+  for (let i = 0; i < values.length; i++) {
+    const value = Math.max(0, Math.min(values[i], maxValue));
+    const radius = (value / maxValue) * maxRadius;
+    const angle = i * angleStep - Math.PI / 2;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0, 200, 255, 1)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.8)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  ctx.restore();
+
+  // Labels außerhalb des Charts
+  ctx.font =
+    "12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  ctx.fillStyle = "rgba(255,255,255,0.9)";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  for (let i = 0; i < labels.length; i++) {
+    const angle = i * angleStep - Math.PI / 2;
+    const labelRadius = maxRadius + 20;
+    const x = centerX + Math.cos(angle) * labelRadius;
+    const y = centerY + Math.sin(angle) * labelRadius;
+
+    ctx.fillText(labels[i], x, y);
+  }
+}
+
+// ===========================
 // Initialisierung
 // ===========================
 document.addEventListener("DOMContentLoaded", () => {
@@ -841,4 +955,25 @@ document.addEventListener("DOMContentLoaded", () => {
   renderAssetTable();
   renderIncidentTable();
   updateDashboard();
+
+  // ----- Spinnweben-Matrix im Dashboard -----
+  const radarLabels = [
+    "Zugangssicherheit",
+    "Überwachung",
+    "IT-Sicherheit",
+    "Brandschutz",
+    "Awareness",
+    "Notfallorganisation",
+  ];
+
+  // vorerst statische Beispielwerte 0–10
+  const radarValues = [7, 5, 8, 6, 4, 7];
+
+  drawSecurityRadar({
+    canvasId: "securityRadar",
+    labels: radarLabels,
+    values: radarValues,
+    maxValue: 10,
+    levels: 5,
+  });
 });
