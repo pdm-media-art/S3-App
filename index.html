@@ -1,1 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Risk & Security Tool - Prototype</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">RISK<span>360</span></div>
+    <div class="header-title">Risiko- & Sicherheitsanalyse</div>
+  </header>
 
+  <nav class="app-nav">
+    <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+    <button class="nav-btn" data-page="threats">Threat Sheet</button>
+    <button class="nav-btn" data-page="assets">Assets</button>
+    <button class="nav-btn" data-page="incidents">Incidents</button>
+  </nav>
+
+  <main class="app-main">
+    <!-- Dashboard -->
+    <section id="page-dashboard" class="page active">
+      <h1>Dashboard</h1>
+      <div class="cards">
+        <div class="card">
+          <div class="card-title">Sicherheitsindex Umfeld</div>
+          <div class="card-value" id="envIndex">–</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Sicherheitsindex Objekt</div>
+          <div class="card-value" id="objIndex">–</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Offene Risiken</div>
+          <div class="card-value" id="openRisks">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Offene Incidents</div>
+          <div class="card-value" id="openIncidents">0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Threat Sheet -->
+    <section id="page-threats" class="page">
+      <div class="page-header">
+        <h1>Threat Sheet (Risiken)</h1>
+        <button id="btnAddRisk" class="primary-btn">+ Neues Risiko</button>
+      </div>
+
+      <div class="filters">
+        <input
+          type="text"
+          id="riskSearch"
+          placeholder="Suche nach Risikoname..."
+        />
+        <select id="riskTypeFilter">
+          <option value="">Alle Risikoarten</option>
+          <option value="Security">Security</option>
+          <option value="Safety">Safety</option>
+          <option value="Compliance">Compliance</option>
+          <option value="Datenschutz">Datenschutz</option>
+          <option value="Brandschutz">Brandschutz</option>
+          <option value="IT">IT</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Risiko</th>
+              <th>Risikoart</th>
+              <th>Priorität</th>
+              <th>Status</th>
+              <th>Risikowert</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody id="riskTableBody">
+            <!-- wird per JS gefüllt -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Assets (Platzhalter) -->
+    <section id="page-assets" class="page">
+      <h1>Assets (Coming soon)</h1>
+      <p>Hier kommt später die Assets- & Vulnerabilitätsanalyse.</p>
+    </section>
+
+    <!-- Incidents (Platzhalter) -->
+    <section id="page-incidents" class="page">
+      <h1>Incident Reporting (Coming soon)</h1>
+      <p>Hier kommt das Vorfallmeldesystem.</p>
+    </section>
+  </main>
+
+  <!-- Modal Risiko hinzufügen / bearbeiten -->
+  <div id="riskModal" class="modal">
+    <div class="modal-backdrop"></div>
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="riskModalTitle">Neues Risiko</h2>
+        <button id="riskModalClose" class="icon-btn">&times;</button>
+      </div>
+
+      <form id="riskForm" class="form">
+        <input type="hidden" id="riskId" />
+
+        <label>
+          Risikoname
+          <input type="text" id="riskName" required />
+        </label>
+
+        <label>
+          Risikoart
+          <select id="riskType" required>
+            <option value="">Bitte wählen</option>
+            <option value="Security">Security</option>
+            <option value="Safety">Safety</option>
+            <option value="Compliance">Compliance</option>
+            <option value="Datenschutz">Datenschutz</option>
+            <option value="Brandschutz">Brandschutz</option>
+            <option value="IT">IT-Risiken</option>
+          </select>
+        </label>
+
+        <label>
+          Priorität
+          <select id="riskPriority" required>
+            <option value="Niedrig">Niedrig</option>
+            <option value="Akzeptabel">Akzeptabel</option>
+            <option value="Moderat">Moderat</option>
+            <option value="Hoch">Hoch</option>
+            <option value="Kritisch">Kritisch</option>
+          </select>
+        </label>
+
+        <label>
+          Status
+          <select id="riskStatus" required>
+            <option value="Not Started">Not Started</option>
+            <option value="Ongoing">Ongoing</option>
+            <option value="Erledigt">Erledigt</option>
+          </select>
+        </label>
+
+        <label>
+          Kurzbeschreibung
+          <textarea id="riskDescription" rows="3"></textarea>
+        </label>
+
+        <div class="form-row-2">
+          <label>
+            Eintrittswahrscheinlichkeit (1–5)
+            <input
+              type="number"
+              id="riskProb"
+              min="1"
+              max="5"
+              value="3"
+            />
+          </label>
+
+          <label>
+            Schadenausmaß (1–5)
+            <input
+              type="number"
+              id="riskImpact"
+              min="1"
+              max="5"
+              value="3"
+            />
+          </label>
+        </div>
+
+        <div class="form-row-2">
+          <label>
+            Risikowert (auto)
+            <input type="number" id="riskScore" readonly />
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="riskCancel" class="secondary-btn">
+            Abbrechen
+          </button>
+          <button type="submit" class="primary-btn">
+            Speichern
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
