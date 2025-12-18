@@ -10,9 +10,6 @@
 
 :root {
   --bg-main: #020617;
-  --bg-elevated: #020617;
-  --bg-card: #020617;
-  --bg-nav: #020617;
   --border-subtle: #1e293b;
   --border-strong: #334155;
 
@@ -28,12 +25,8 @@
   --accent-incident-soft: #2dd4bf;
 
   --danger: #f97373;
-  --danger-soft: rgba(248, 113, 113, 0.18);
-
-  --table-row-hover: rgba(15, 23, 42, 0.9);
 
   --radius-lg: 16px;
-  --radius-md: 10px;
   --radius-pill: 999px;
 
   --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.95);
@@ -207,19 +200,6 @@ body {
   overflow: hidden;
 }
 
-.card::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: radial-gradient(
-    circle at top right,
-    rgba(249, 115, 22, 0.035),
-    transparent 55%
-  );
-  opacity: 0.9;
-  pointer-events: none;
-}
-
 .card-title {
   font-size: 0.82rem;
   text-transform: uppercase;
@@ -261,11 +241,6 @@ body {
   box-shadow: 0 14px 28px rgba(248, 113, 22, 0.65);
 }
 
-.primary-btn:active {
-  transform: translateY(0.5px) scale(0.98);
-  box-shadow: 0 8px 18px rgba(248, 113, 22, 0.45);
-}
-
 .secondary-btn {
   background: transparent;
   color: var(--text-main);
@@ -289,20 +264,19 @@ body {
   transform: translateY(-0.5px);
 }
 
-/* Türkiser Button nur für "Neuer Vorfall" */
-
+/* Türkiser Stil nur für Button "Neuer Vorfall" */
 .incident-btn {
-  background: var(--accent-incident);
-  color: #0f172a;
-  box-shadow: 0 8px 18px rgba(20, 184, 166, 0.55);
+  background: var(--accent-incident) !important;
+  color: #0f172a !important;
+  box-shadow: 0 8px 18px rgba(20, 184, 166, 0.55) !important;
 }
 
 .incident-btn:hover {
-  background: var(--accent-incident-soft);
-  box-shadow: 0 14px 30px rgba(20, 184, 166, 0.7);
+  background: var(--accent-incident-soft) !important;
+  box-shadow: 0 14px 30px rgba(20, 184, 166, 0.7) !important;
 }
 
-/* kleine Icon-Buttons (X etc.) */
+/* Icon-Buttons (X) */
 
 .icon-btn {
   border: none;
@@ -408,7 +382,7 @@ body {
 }
 
 .data-table tbody tr:hover {
-  background: var(--table-row-hover);
+  background: rgba(15, 23, 42, 0.9);
 }
 
 /* Table action buttons */
@@ -449,8 +423,8 @@ body {
 .risk-matrix {
   margin-top: 12px;
   padding: 14px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  border: 1px solid #1e293b;
   background: radial-gradient(circle at top, #020617, #020617 60%, #000 100%);
   box-shadow: var(--shadow-soft);
 }
@@ -524,7 +498,7 @@ body {
   position: relative;
   background: #020617;
   color: var(--text-main);
-  border-radius: var(--radius-lg);
+  border-radius: 16px;
   padding: 20px 20px 16px;
   max-width: 720px;
   width: 100%;
