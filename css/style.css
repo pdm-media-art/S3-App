@@ -517,3 +517,140 @@ body {
     margin: 10vh 0.75rem;
   }
 }
+/* ========== MODALS FIX ========== */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;            /* standardmäßig unsichtbar */
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;     /* klickt nicht durch, solange nicht open */
+}
+
+.modal.open {
+  display: flex;            /* sichtbar, zentriert */
+  pointer-events: auto;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.modal-content {
+  position: relative;
+  background: #0f172a;     /* an dein Farbschema anpassen */
+  color: #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* Modal-Header & Footer */
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+.icon-btn:hover {
+  color: #f97316;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Buttons (falls noch nicht vorhanden) */
+
+.primary-btn {
+  background: #f97316;
+  color: #0f172a;
+  border-radius: 999px;
+  border: none;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.primary-btn:hover {
+  background: #fb923c;
+}
+
+.secondary-btn {
+  background: transparent;
+  color: #e5e7eb;
+  border-radius: 999px;
+  border: 1px solid #6b7280;
+  padding: 8px 18px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.secondary-btn:hover {
+  border-color: #9ca3af;
+}
+
+/* Formular-Layout im Modal */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.form input,
+.form select,
+.form textarea {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+}
+
+.form input:focus,
+.form select:focus,
+.form textarea:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.4);
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
