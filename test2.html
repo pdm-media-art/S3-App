@@ -2185,10 +2185,11 @@
     }
 
     function initAssetFilters() {
-      const searchEl = $("#assetSearch");
-      const zoneFilterEl = $("#assetZoneFilter");
-      if (searchEl) searchEl.addEventListener("input", renderAssetTable);
-      if (zoneFilterEl) zoneFilterEl.addEventListener("change",
+  const searchEl = $("#assetSearch");
+  const zoneFilterEl = $("#assetZoneFilter");
+  if (searchEl) searchEl.addEventListener("input", renderAssetTable);
+  if (zoneFilterEl) zoneFilterEl.addEventListener("change", renderAssetTable);
+}
 // ===========================
     // Incident-Modal & Logik
     // ===========================
