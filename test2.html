@@ -24,11 +24,11 @@
       --text-muted: #9ca3af;
       --text-soft: #6b7280;
 
-      --accent: #f97316;         /* Orange: Primary allgemein */
+      --accent: #f97316;
       --accent-soft: #fb923c;
       --accent-soft2: #fed7aa;
 
-      --accent-incident: #14b8a6; /* Türkis: Incident-Button */
+      --accent-incident: #14b8a6;
       --accent-incident-soft: #2dd4bf;
 
       --danger: #f97373;
@@ -86,7 +86,6 @@
       width: 32px;
       border-radius: 10px;
       box-shadow: 0 0 0 2px rgba(248, 250, 252, 0.06);
-      object-fit: contain;
       background: radial-gradient(circle at top left, #f97316, #0f172a);
     }
 
@@ -802,7 +801,6 @@
 <body>
   <header class="app-header">
     <div class="logo">
-      <!-- Falls kein echtes Logo vorhanden ist, bleibt der Hintergrundgradient sichtbar -->
       <div class="logo-icon"></div>
       <span class="logo-text">SecureStay: Analytics</span>
     </div>
@@ -886,16 +884,12 @@
               <th>Aktionen</th>
             </tr>
           </thead>
-          <tbody id="riskTableBody">
-            <!-- wird per JS gefüllt -->
-          </tbody>
+          <tbody id="riskTableBody"></tbody>
         </table>
       </div>
 
       <h2>Risikomatrix</h2>
-      <div id="riskMatrix" class="risk-matrix">
-        <!-- wird per JS gebaut -->
-      </div>
+      <div id="riskMatrix" class="risk-matrix"></div>
     </section>
 
     <!-- Assets -->
@@ -933,9 +927,7 @@
               <th>Aktionen</th>
             </tr>
           </thead>
-          <tbody id="assetTableBody">
-            <!-- per JS -->
-          </tbody>
+          <tbody id="assetTableBody"></tbody>
         </table>
       </div>
     </section>
@@ -986,9 +978,7 @@
               <th>Aktionen</th>
             </tr>
           </thead>
-          <tbody id="incidentTableBody">
-            <!-- per JS -->
-          </tbody>
+          <tbody id="incidentTableBody"></tbody>
         </table>
       </div>
     </section>
@@ -1163,13 +1153,13 @@
       </div>
 
       <div class="roadmap-summary">
-        <span id="roadmap-stats">0 / 0 Milestones erledigt</span>
+        <span>Roadmap-Status (manuell durch An-/Abhaken)</span>
         <div class="progress-bar">
           <div class="progress-bar-inner" id="roadmap-progress"></div>
         </div>
       </div>
 
-      <div class="roadmap-grid" id="roadmap-grid">
+      <div class="roadmap-grid">
         <!-- Phase 1 -->
         <div class="card roadmap-phase">
           <div class="roadmap-phase-header">
@@ -1178,25 +1168,25 @@
           </div>
           <ul class="milestone-list">
             <li class="milestone-item">
-              <input type="checkbox" id="ms-1-1" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-1-1" />
               <label for="ms-1-1" class="milestone-label">
                 Interviewleitfäden erstellen &amp; Power App vorbereiten
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-1-2" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-1-2" />
               <label for="ms-1-2" class="milestone-label">
                 Erste Interviews und On-site Visits durchführen
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-1-3" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-1-3" />
               <label for="ms-1-3" class="milestone-label">
                 Context, Environment &amp; Object Analysis-Checklisten ausfüllen
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-1-4" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-1-4" />
               <label for="ms-1-4" class="milestone-label">
                 Vulnerability- und Threat Sheet initial befüllen
               </label>
@@ -1212,25 +1202,25 @@
           </div>
           <ul class="milestone-list">
             <li class="milestone-item">
-              <input type="checkbox" id="ms-2-1" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-2-1" />
               <label for="ms-2-1" class="milestone-label">
                 Risikobewertung in Listen/Excel aufsetzen
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-2-2" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-2-2" />
               <label for="ms-2-2" class="milestone-label">
                 Risk level je Objekt/Standort berechnen
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-2-3" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-2-3" />
               <label for="ms-2-3" class="milestone-label">
                 Maßnahmenpakete je Risiko (mitigate/transfer/accept/avoid) definieren
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-2-4" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-2-4" />
               <label for="ms-2-4" class="milestone-label">
                 KI-Analyse (Trends &amp; Hotspots) konfigurieren und testen
               </label>
@@ -1246,25 +1236,25 @@
           </div>
           <ul class="milestone-list">
             <li class="milestone-item">
-              <input type="checkbox" id="ms-3-1" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-3-1" />
               <label for="ms-3-1" class="milestone-label">
                 Power BI-Datenmodell für Risk Environment erstellen
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-3-2" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-3-2" />
               <label for="ms-3-2" class="milestone-label">
                 Main Dashboard (Weltkarte + Objektübersicht) aufbauen
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-3-3" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-3-3" />
               <label for="ms-3-3" class="milestone-label">
                 Objekt-Dashboards (Barometry, Assets, Vulnerabilities) konfigurieren
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-3-4" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-3-4" />
               <label for="ms-3-4" class="milestone-label">
                 Threat Sheet &amp; Konzept-Presentation finalisieren
               </label>
@@ -1280,25 +1270,25 @@
           </div>
           <ul class="milestone-list">
             <li class="milestone-item">
-              <input type="checkbox" id="ms-4-1" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-4-1" />
               <label for="ms-4-1" class="milestone-label">
                 Anforderungen (Text, Grafiken, Beispielfotos) final ausformulieren
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-4-2" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-4-2" />
               <label for="ms-4-2" class="milestone-label">
                 Geeignete Freelancer auswählen &amp; beauftragen
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-4-3" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-4-3" />
               <label for="ms-4-3" class="milestone-label">
                 Ergebnisse der Freelancer reviewen &amp; integrieren
               </label>
             </li>
             <li class="milestone-item">
-              <input type="checkbox" id="ms-4-4" class="milestone-checkbox" />
+              <input type="checkbox" id="ms-4-4" />
               <label for="ms-4-4" class="milestone-label">
                 Feldtest durchführen, Feedback sammeln und Go/No-Go entscheiden
               </label>
@@ -1943,10 +1933,7 @@
             {},
             createEl(
               "button",
-              {
-                class: "table-action-btn",
-                onclick: () => openRiskModal(risk),
-              },
+              { class: "table-action-btn", onclick: () => openRiskModal(risk) },
               "Bearbeiten"
             ),
             " ",
@@ -2137,7 +2124,6 @@
         });
     }
 
-    // Asset-Tabelle & Filter
     function renderAssetTable() {
       const tbody = $("#assetTableBody");
       if (!tbody) return;
@@ -2173,10 +2159,7 @@
             {},
             createEl(
               "button",
-              {
-                class: "table-action-btn",
-                onclick: () => openAssetModal(asset),
-              },
+              { class: "table-action-btn", onclick: () => openAssetModal(asset) },
               "Bearbeiten"
             ),
             " ",
@@ -2202,4 +2185,7 @@
     }
 
     function initAssetFilters() {
-      const searchEl = $("#asset
+      const searchEl = $("#assetSearch");
+      const zoneFilterEl = $("#assetZoneFilter");
+      if (searchEl) searchEl.addEventListener("input", renderAssetTable);
+      if (zoneFilterEl) zoneFilterEl.addEventListener("change",
